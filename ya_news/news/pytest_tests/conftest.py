@@ -1,18 +1,16 @@
 import pytest
-
-from news.models import News, Comment
+from datetime import datetime, timedelta
 
 from django.test.client import Client
 from django.conf import settings
-from django.utils import timezone
 from django.urls import reverse
 
-from datetime import datetime, timedelta
+from news.models import News, Comment
 
 
 @pytest.fixture
-def anonymous(django_user_model):
-    return django_user_model.objects.create(username='Анонимный пользователь')
+def anonymous(client):
+    return client
 
 
 @pytest.fixture
@@ -59,11 +57,6 @@ def comment(author, news):
 
 
 @pytest.fixture
-def pk_for_args(comment):
-    return (comment.pk,)
-
-
-@pytest.fixture
 def news_count():
     today = datetime.today()
     News.objects.bulk_create(
@@ -77,27 +70,40 @@ def news_count():
 
 
 @pytest.fixture
-def news_comments(author):
-    now = timezone.now()
-    news = News.objects.create(
-        title='Заголовок',
-        text='Текст заметки',
-    )
-    comments = []
-    for index in range(10):
-        comment = Comment.objects.create(
-            news=news,
-            text=f'Tекст {index}',
-            created=now + timedelta(days=index),
-            author=author
-        )
-    comments.append(comment)
-    return {
-        'detail': reverse('news:detail', args=(news.pk,))
-    }
+def home_url():
+    return reverse('news:home')
 
 
 @pytest.fixture
-def form_data():
-    return {'news': 'Заголовок',
-            'text': 'Текст'}
+def detail_url(news):
+    return reverse('news:detail', args=(news.pk,))
+
+
+@pytest.fixture(autouse=True)
+def enable_db_access_for_all_tests(db):
+    pass
+
+
+@pytest.fixture
+def edit_url(comment):
+    return reverse('news:edit', args=(comment.pk,))
+
+
+@pytest.fixture
+def delete_url(comment):
+    return reverse('news:delete', args=(comment.pk,))
+
+
+@pytest.fixture
+def login_url():
+    return reverse('users:login')
+
+
+@pytest.fixture
+def signup_url():
+    return reverse('users:signup')
+
+
+@pytest.fixture
+def logout_url():
+    return reverse('users:logout')

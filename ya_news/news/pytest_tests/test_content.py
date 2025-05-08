@@ -1,33 +1,29 @@
 import pytest
 
-from django.urls import reverse
 from django.conf import settings
 
 from news.forms import CommentForm
 
+PYTESTMARK = pytest.mark.django_db
 
-@pytest.mark.django_db
-def test_news_count(client, news_count):
-    url = reverse('news:home')
-    response = client.get(url)
-    object_list = response.context['object_list']
-    news_count = len(object_list)
+
+def test_news_count(client, home_url, news_count):
+    response = client.get(home_url)
+    news_on_page = response.context['object_list']
+    news_count = len(news_on_page)
     assert news_count == settings.NEWS_COUNT_ON_HOME_PAGE
 
 
-@pytest.mark.django_db
-def test_news_order(client):
-    url = reverse('news:home')
-    response = client.get(url)
-    object_list = response.context['object_list']
-    all_dates = [news.date for news in object_list]
+def test_news_order(client, home_url):
+    response = client.get(home_url)
+    news_on_page = response.context['object_list']
+    all_dates = [news.date for news in news_on_page]
     sorted_dates = sorted(all_dates, reverse=True)
     assert sorted_dates == all_dates
 
 
-def test_comments_order(client, news_comments):
-    url = news_comments['detail']
-    response = client.get(url)
+def test_comments_order(client, detail_url):
+    response = client.get(detail_url)
     assert 'news' in response.context
     news = response.context['news']
     all_comments = news.comment_set.all()
@@ -36,14 +32,12 @@ def test_comments_order(client, news_comments):
     assert sorted_timestamps == all_timestamps
 
 
-def test_anonymous_client_has_no_form(client, news_comments):
-    url = news_comments['detail']
-    response = client.get(url)
+def test_anonymous_client_has_no_form(client, detail_url):
+    response = client.get(detail_url)
     assert 'form' not in response.context
 
 
-def test_authorized_client_has_form(author_client, news_comments):
-    url = news_comments['detail']
-    response = author_client.get(url)
+def test_authorized_client_has_form(author_client, detail_url):
+    response = author_client.get(detail_url)
     assert 'form' in response.context
     assert isinstance(response.context['form'], CommentForm)
