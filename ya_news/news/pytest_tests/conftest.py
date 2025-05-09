@@ -1,20 +1,16 @@
-import pytest
 from datetime import datetime, timedelta
 
+import pytest
 from django.test.client import Client
 from django.conf import settings
 from django.urls import reverse
+from django.utils import timezone
 
 from news.models import News, Comment
 
 
 @pytest.fixture
-def anonymous(client):
-    return client
-
-
-@pytest.fixture
-def news(anonymous):
+def news():
     news = News.objects.create(
         title='Заголовок',
         text='Просто текст.',
@@ -57,7 +53,7 @@ def comment(author, news):
 
 
 @pytest.fixture
-def news_count():
+def news_create():
     today = datetime.today()
     News.objects.bulk_create(
         News(
@@ -66,6 +62,19 @@ def news_count():
             date=today - timedelta(days=index)
         )
         for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
+    )
+
+
+@pytest.fixture
+def comment_create(news, author):
+    Comment.objects.bulk_create(
+        Comment(
+            news=news,
+            author=author,
+            text='Просто комментарий',
+            created=timezone.now() - timedelta(days=index)
+        )
+        for index in range(10)
     )
 
 
@@ -107,3 +116,13 @@ def signup_url():
 @pytest.fixture
 def logout_url():
     return reverse('users:logout')
+
+
+@pytest.fixture
+def edit_url_redirect(edit_url, login_url):
+    return f"{login_url}?next={edit_url}"
+
+
+@pytest.fixture
+def delete_url_redirect(delete_url, login_url):
+    return f"{login_url}?next={delete_url}"

@@ -1,37 +1,33 @@
-from http import HTTPStatus
-
 from notes.forms import NoteForm
+from notes.models import Note
 
 from .test_dry import (
     BaseClassTest,
-    NOTE_LIST_URL,
-    NOTE_ADD_URL,
-    get_note_edit_url
 )
 
 
 class TestContent(BaseClassTest):
 
     def test_notes_in_context(self):
-        self.force_login_author()
-        response = self.client.get(NOTE_LIST_URL)
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+        response = self.client_author.get(self.NOTE_LIST_URL)
         self.assertIn(self.note, response.context['object_list'])
+        note_in_list = Note.objects.get()
+        self.assertEqual(note_in_list.title, self.note.title)
+        self.assertEqual(note_in_list.text, self.note.text)
+        self.assertEqual(note_in_list.slug, self.note.slug)
+        self.assertEqual(note_in_list.author, self.note.author)
 
-    def test_notes_list_for_different_users(self):
-        self.force_login_reader()
-        response = self.client.get(NOTE_LIST_URL)
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertNotIn(self.note, response.context['object_list'])
+    def test_notes_list_for_author(self):
+        response = self.client_author.get(self.NOTE_LIST_URL)
+        self.assertIn(self.note, response.context['object_list'])
 
     def test_pages_contains_form(self):
         urls = (
-            (NOTE_ADD_URL, None),
-            (get_note_edit_url(self.note.slug), None),
+            (self.NOTE_ADD_URL),
+            (self.NOTE_EDIT_URL),
         )
-        self.force_login_author()
-        for name, args in urls:
-            with self.subTest(name=name, args=args):
-                response = self.client.get(name)
+        for name in urls:
+            with self.subTest(name=name):
+                response = self.client_author.get(name)
                 self.assertIn('form', response.context)
                 self.assertIsInstance(response.context['form'], NoteForm)

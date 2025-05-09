@@ -4,31 +4,34 @@ from http import HTTPStatus
 
 from pytest_django.asserts import assertRedirects
 
+CLIENT = pytest.lazy_fixture('client')
+AUTHOR_CLIENT = pytest.lazy_fixture('author_client')
+NOT_AUTHOR_CLIENT = pytest.lazy_fixture('not_author_client')
+HOME_URL = pytest.lazy_fixture('home_url')
+DETAIL_URL = pytest.lazy_fixture('detail_url')
+LOGIN_URL = pytest.lazy_fixture('login_url')
+SIGNUP_URL = pytest.lazy_fixture('signup_url')
+LOGOUT_URL = pytest.lazy_fixture('logout_url')
+EDIT_URL = pytest.lazy_fixture('edit_url')
+DELETE_URL = pytest.lazy_fixture('delete_url')
+EDIT_URL_REDIRECT = pytest.lazy_fixture('edit_url_redirect')
+DELETE_URL_REDIRECT = pytest.lazy_fixture('delete_url_redirect')
+
 
 @pytest.mark.parametrize(
     'url_fixture, parametrized_client, expected_status, method',
     (
-        (pytest.lazy_fixture('home_url'),
-            pytest.lazy_fixture('anonymous'), HTTPStatus.OK, 'get'),
-        (pytest.lazy_fixture('detail_url'),
-            pytest.lazy_fixture('anonymous'), HTTPStatus.OK, 'get'),
-        (pytest.lazy_fixture('login_url'),
-            pytest.lazy_fixture('anonymous'), HTTPStatus.OK, 'get'),
-        (pytest.lazy_fixture('signup_url'),
-            pytest.lazy_fixture('anonymous'), HTTPStatus.OK, 'get'),
-        (pytest.lazy_fixture('logout_url'),
-            pytest.lazy_fixture('anonymous'), HTTPStatus.OK, 'post'),
-        (pytest.lazy_fixture('edit_url'),
-            pytest.lazy_fixture('author_client'), HTTPStatus.OK, 'get'),
-        (pytest.lazy_fixture('delete_url'),
-            pytest.lazy_fixture('author_client'), HTTPStatus.OK, 'get'),
-        (pytest.lazy_fixture('edit_url'),
-            pytest.lazy_fixture('not_author_client'),
-            HTTPStatus.NOT_FOUND, 'get'),
-        (pytest.lazy_fixture('delete_url'),
-            pytest.lazy_fixture('not_author_client'),
-            HTTPStatus.NOT_FOUND, 'get'),
-
+        (HOME_URL, CLIENT, HTTPStatus.OK, 'get'),
+        (DETAIL_URL, CLIENT, HTTPStatus.OK, 'get'),
+        (LOGIN_URL, CLIENT, HTTPStatus.OK, 'get'),
+        (SIGNUP_URL, CLIENT, HTTPStatus.OK, 'get'),
+        (LOGOUT_URL, CLIENT, HTTPStatus.OK, 'post'),
+        (EDIT_URL, AUTHOR_CLIENT, HTTPStatus.OK, 'get'),
+        (DELETE_URL, AUTHOR_CLIENT, HTTPStatus.OK, 'get'),
+        (EDIT_URL, NOT_AUTHOR_CLIENT, HTTPStatus.NOT_FOUND, 'get'),
+        (DELETE_URL, NOT_AUTHOR_CLIENT, HTTPStatus.NOT_FOUND, 'get'),
+        (EDIT_URL, CLIENT, HTTPStatus.FOUND, 'get'),
+        (DELETE_URL, CLIENT, HTTPStatus.FOUND, 'get'),
     )
 )
 def test_status_code(
@@ -45,15 +48,12 @@ def test_status_code(
 
 
 @pytest.mark.parametrize(
-    'url_fixture, expected_url, parametrized_client',
+    'expected_url, url_fixture, parametrized_client',
     (
-        (pytest.lazy_fixture('edit_url'), pytest.lazy_fixture('login_url'),
-            pytest.lazy_fixture('anonymous')),
-        (pytest.lazy_fixture('delete_url'), pytest.lazy_fixture('login_url'),
-            pytest.lazy_fixture('anonymous')),
+        (EDIT_URL_REDIRECT, EDIT_URL, CLIENT),
+        (DELETE_URL_REDIRECT, DELETE_URL, CLIENT),
     )
 )
-def test_redirect(url_fixture, parametrized_client, login_url, expected_url):
-    expected_url = f'{login_url}?next={url_fixture}'
+def test_redirect(url_fixture, parametrized_client, expected_url):
     response = parametrized_client.get(url_fixture)
     assertRedirects(response, expected_url)
