@@ -53,7 +53,7 @@ def comment(author, news):
 
 
 @pytest.fixture
-def news_create():
+def news_selection():
     today = datetime.today()
     News.objects.bulk_create(
         News(
@@ -66,16 +66,18 @@ def news_create():
 
 
 @pytest.fixture
-def comment_create(news, author):
-    Comment.objects.bulk_create(
-        Comment(
+def comment_selection(news, author):
+    comments = []
+    for index in range(10):
+        comment = Comment.objects.create(
             news=news,
             author=author,
-            text='Просто комментарий',
-            created=timezone.now() - timedelta(days=index)
+            text='Просто комментарий'
         )
-        for index in range(10)
-    )
+    comment.created = timezone.now() + timedelta(days=index)
+    comment.save()
+    comments.append(comment)
+    return comments
 
 
 @pytest.fixture
@@ -120,9 +122,14 @@ def logout_url():
 
 @pytest.fixture
 def edit_url_redirect(edit_url, login_url):
-    return f"{login_url}?next={edit_url}"
+    return f'{login_url}?next={edit_url}'
 
 
 @pytest.fixture
 def delete_url_redirect(delete_url, login_url):
-    return f"{login_url}?next={delete_url}"
+    return f'{login_url}?next={delete_url}'
+
+
+@pytest.fixture
+def detail_url_comment(detail_url):
+    return f'{detail_url}#comments'

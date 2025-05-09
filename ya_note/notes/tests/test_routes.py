@@ -1,40 +1,50 @@
 from http import HTTPStatus
 
 from .test_dry import (
-    BaseClassTest
+    BaseClassTest,
+    LOGIN_URL,
+    LOGOUT_URL,
+    NOTE_ADD_URL,
+    NOTE_DETAIL_URL,
+    NOTE_DELETE_URL,
+    NOTE_EDIT_URL,
+    NOTE_HOME_URL,
+    NOTE_LIST_URL,
+    NOTE_SUCCESS_URL,
+    SIGNUP_URL,
 )
 
 
 class TestRoutes(BaseClassTest):
     def test_response(self):
         test_list = [
-            [self.NOTE_HOME_URL, self.client, HTTPStatus.OK, 'get'],
-            [self.LOGIN_URL, self.client, HTTPStatus.OK, 'get'],
-            [self.LOGOUT_URL, self.client, HTTPStatus.OK, 'post'],
-            [self.SIGNUP_URL, self.client, HTTPStatus.OK, 'get'],
-            [self.NOTE_LIST_URL, self.client_author, HTTPStatus.OK, 'get'],
-            [self.NOTE_SUCCESS_URL, self.client_author, HTTPStatus.OK, 'get'],
-            [self.NOTE_ADD_URL, self.client_author, HTTPStatus.OK, 'get'],
-            [self.NOTE_DETAIL_URL, self.client_author,
+            [NOTE_HOME_URL, self.client, HTTPStatus.OK, 'get'],
+            [LOGIN_URL, self.client, HTTPStatus.OK, 'get'],
+            [LOGOUT_URL, self.client, HTTPStatus.OK, 'post'],
+            [SIGNUP_URL, self.client, HTTPStatus.OK, 'get'],
+            [NOTE_LIST_URL, self.client_author, HTTPStatus.OK, 'get'],
+            [NOTE_SUCCESS_URL, self.client_author, HTTPStatus.OK, 'get'],
+            [NOTE_ADD_URL, self.client_author, HTTPStatus.OK, 'get'],
+            [NOTE_DETAIL_URL, self.client_author,
                 HTTPStatus.OK, 'get'],
-            [self.NOTE_EDIT_URL, self.client_author,
+            [NOTE_EDIT_URL, self.client_author,
                 HTTPStatus.OK, 'get'],
-            [self.NOTE_DELETE_URL, self.client_author,
+            [NOTE_DELETE_URL, self.client_author,
                 HTTPStatus.OK, 'get'],
-            [self.NOTE_DETAIL_URL, self.client_reader,
+            [NOTE_DETAIL_URL, self.client_reader,
                 HTTPStatus.NOT_FOUND, 'get'],
-            [self.NOTE_EDIT_URL, self.client_reader,
+            [NOTE_EDIT_URL, self.client_reader,
                 HTTPStatus.NOT_FOUND, 'get'],
-            [self.NOTE_DELETE_URL, self.client_reader,
+            [NOTE_DELETE_URL, self.client_reader,
                 HTTPStatus.NOT_FOUND, 'get'],
-            [self.NOTE_LIST_URL, self.client, HTTPStatus.FOUND, 'get'],
-            [self.NOTE_SUCCESS_URL, self.client, HTTPStatus.FOUND, 'get'],
-            [self.NOTE_ADD_URL, self.client, HTTPStatus.FOUND, 'get'],
-            [self.NOTE_DETAIL_URL, self.client,
+            [NOTE_LIST_URL, self.client, HTTPStatus.FOUND, 'get'],
+            [NOTE_SUCCESS_URL, self.client, HTTPStatus.FOUND, 'get'],
+            [NOTE_ADD_URL, self.client, HTTPStatus.FOUND, 'get'],
+            [NOTE_DETAIL_URL, self.client,
                 HTTPStatus.FOUND, 'get'],
-            [self.NOTE_EDIT_URL, self.client,
+            [NOTE_EDIT_URL, self.client,
                 HTTPStatus.FOUND, 'get'],
-            [self.NOTE_DELETE_URL, self.client,
+            [NOTE_DELETE_URL, self.client,
                 HTTPStatus.FOUND, 'get'],
         ]
 
@@ -48,12 +58,12 @@ class TestRoutes(BaseClassTest):
 
     def test_redirects_for_anonymous(self):
         test_list = [
-            [self.NOTE_LIST_URL, self.login_next_list_url],
-            [self.NOTE_SUCCESS_URL, self.login_next_success_url],
-            [self.NOTE_ADD_URL, self.login_next_add_url],
-            [self.NOTE_DETAIL_URL, self.login_next_detail_url],
-            [self.NOTE_EDIT_URL, self.login_next_edit_url],
-            [self.NOTE_DELETE_URL, self.login_next_delete_url],
+            [NOTE_LIST_URL, self.login_next_list_url],
+            [NOTE_SUCCESS_URL, self.login_next_success_url],
+            [NOTE_ADD_URL, self.login_next_add_url],
+            [NOTE_DETAIL_URL, self.login_next_detail_url],
+            [NOTE_EDIT_URL, self.login_next_edit_url],
+            [NOTE_DELETE_URL, self.login_next_delete_url],
         ]
         for url, expected_redirect in test_list:
             with self.subTest(url=url):

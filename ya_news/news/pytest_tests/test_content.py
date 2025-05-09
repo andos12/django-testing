@@ -3,11 +3,11 @@ from django.conf import settings
 from news.forms import CommentForm
 
 
-def test_news_count(client, home_url, news_create):
+def test_news_count(client, home_url, news_selection):
     response = client.get(home_url)
     news_on_page = response.context['object_list']
-    news_create = len(news_on_page)
-    assert news_create == settings.NEWS_COUNT_ON_HOME_PAGE
+    news_selection = len(news_on_page)
+    assert news_selection == settings.NEWS_COUNT_ON_HOME_PAGE
 
 
 def test_news_order(client, home_url):
@@ -18,8 +18,8 @@ def test_news_order(client, home_url):
     assert sorted_dates == all_dates
 
 
-def test_comments_order(client, detail_url, comment_create):
-    news = comment_create
+def test_comments_order(client, detail_url, comment_selection):
+    news = comment_selection
     response = client.get(detail_url)
     assert 'news' in response.context
     news = response.context['news']
