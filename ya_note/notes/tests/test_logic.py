@@ -69,7 +69,7 @@ class TestLogic(BaseClassTest):
         self.assertEqual(note_after.slug, self.form_data['slug'])
         self.assertEqual(note_after.author, self.note.author)
 
-    def test_clien_reader_cant_edit_note(self):
+    def test_client_reader_cant_edit_note_from_client_author(self):
         response = self.client_reader.post(
             NOTE_EDIT_URL,
             data=self.form_data
@@ -88,7 +88,7 @@ class TestLogic(BaseClassTest):
         self.assertEqual(Note.objects.count(), current_note_count - 1)
         self.assertFalse(Note.objects.filter(slug=self.note.slug).exists())
 
-    def test_client_reader_cant_delete_note(self):
+    def test_client_reader_cant_delete_note_from_client_author(self):
         self.assertTrue(Note.objects.filter(id=self.note.id).exists())
         response = self.client_reader.post(NOTE_DELETE_URL)
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)

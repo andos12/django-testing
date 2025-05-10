@@ -130,8 +130,3 @@ def delete_url_redirect(delete_url, login_url):
 @pytest.fixture
 def detail_url_comment(detail_url):
     return f'{detail_url}#comments'
-
-
-@pytest.fixture
-def get_bad_words_data(bad_word):
-    return {'text': f'Какой-то текст, {bad_word}, еще текст'}

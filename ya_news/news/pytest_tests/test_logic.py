@@ -10,6 +10,10 @@ from news.models import Comment
 FORM_DATA = {'text': 'Текст'}
 
 
+def get_bad_words_data(bad_word):
+    return {'text': f'Какой-то текст, {bad_word}, еще текст'}
+
+
 def test_anonymous_user_cant_create_comment(client, detail_url):
     client.post(detail_url, data=FORM_DATA)
     comments_count = Comment.objects.count()
@@ -31,11 +35,10 @@ def test_user_cant_use_bad_words(
     author_client,
     detail_url,
     bad_word,
-    get_bad_words_data
 ):
     response = author_client.post(
         detail_url,
-        data=get_bad_words_data
+        data=get_bad_words_data(bad_word)
     )
     assert 'form' in response.context
     form = response.context['form']
@@ -60,7 +63,7 @@ def test_author_can_edit_comment(
     comment_updated = Comment.objects.get(id=comment.id)
     assert comment_updated.author == comment.author
     assert comment_updated.news == comment.news
-    assert comment_updated.text != comment.text
+    assert comment_updated.text == FORM_DATA['text']
 
 
 def test_user_cant_edit_comment_of_another_user(
