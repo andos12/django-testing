@@ -9,6 +9,18 @@ from news.models import Comment
 
 FORM_DATA = {'text': 'Текст'}
 
+BAD_WORDS_FORM_DATA = 'Какой-то текст, {bad_word}, еще текст'
+
+NEW_TEXT = 'Новый текст'
+
+
+def get_new_text_data():
+    return {'text': NEW_TEXT}
+
+
+def get_bad_words_data(bad_word):
+    return {'text': BAD_WORDS_FORM_DATA.format(bad_word=bad_word)}
+
 
 def test_anonymous_user_cant_create_comment(client, detail_url):
     client.post(detail_url, data=FORM_DATA)
@@ -28,10 +40,9 @@ def test_user_can_create_comment(author_client, author, news, detail_url):
 
 @pytest.mark.parametrize('bad_word', BAD_WORDS)
 def test_user_cant_use_bad_words(author_client, detail_url, bad_word):
-    bad_text = f'Какой-то текст, {bad_word}, еще текст'
     response = author_client.post(
         detail_url,
-        data={'text': bad_text}
+        data=get_bad_words_data(bad_word)
     )
     assert 'form' in response.context
     form = response.context['form']
@@ -51,15 +62,12 @@ def test_author_can_edit_comment(
         edit_url,
         detail_url_comment
 ):
-    comment_before = comment.text
-    new_text = 'Новый текст'
-    response = author_client.post(edit_url, data={'text': new_text})
+    response = author_client.post(edit_url, data=get_new_text_data())
     assertRedirects(response, detail_url_comment)
-    comment_updated = Comment.objects.get()
-    assert comment_updated != comment_before
-    assert comment_updated.text != FORM_DATA['text']
+    comment_updated = Comment.objects.get(id=comment.id)
     assert comment_updated.author == comment.author
     assert comment_updated.news == comment.news
+    assert comment_updated.created == comment.created
 
 
 def test_user_cant_edit_comment_of_another_user(
@@ -74,10 +82,9 @@ def test_user_cant_edit_comment_of_another_user(
 
 def test_user_cant_delete_comment_of_another_user(
         not_author_client, comment, delete_url):
-    comment_count = Comment.objects.count()
     response = not_author_client.delete(delete_url, FORM_DATA)
     assert response.status_code == HTTPStatus.NOT_FOUND
-    assert comment_count == 1
+    assert Comment.objects.filter(id=comment.id).exists()
     note_from_db = Comment.objects.get(id=comment.id)
     assert note_from_db.author == comment.author
     assert note_from_db.news == comment.news

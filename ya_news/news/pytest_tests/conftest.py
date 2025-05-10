@@ -67,17 +67,14 @@ def news_selection():
 
 @pytest.fixture
 def comment_selection(news, author):
-    comments = []
     for index in range(10):
         comment = Comment.objects.create(
             news=news,
             author=author,
             text='Просто комментарий'
         )
-    comment.created = timezone.now() + timedelta(days=index)
-    comment.save()
-    comments.append(comment)
-    return comments
+        comment.created = timezone.now() + timedelta(days=index)
+        comment.save()
 
 
 @pytest.fixture

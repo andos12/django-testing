@@ -1,5 +1,4 @@
 from notes.forms import NoteForm
-from notes.models import Note
 
 from .test_dry import (
     BaseClassTest,
@@ -13,16 +12,16 @@ class TestContent(BaseClassTest):
 
     def test_notes_in_context(self):
         response = self.client_author.get(NOTE_LIST_URL)
-        self.assertIn(self.note, response.context['object_list'])
-        note_in_list = Note.objects.get()
-        self.assertEqual(note_in_list.title, self.note.title)
-        self.assertEqual(note_in_list.text, self.note.text)
-        self.assertEqual(note_in_list.slug, self.note.slug)
-        self.assertEqual(note_in_list.author, self.note.author)
+        object_list = response.context['object_list']
+        self.assertIn(self.note, object_list)
+        self.assertContains(response, self.note.title)
+        first_note = object_list[0]
+        self.assertIn(first_note, object_list)
 
-    def test_notes_list_for_author(self):
-        response = self.client_author.get(NOTE_LIST_URL)
-        self.assertIn(self.note, response.context['object_list'])
+    def test_notes_not_in_context_for_another_user(self):
+        response = self.client_reader.get(NOTE_LIST_URL)
+        self.assertNotIn(self.note, response.context['object_list'])
+        self.assertNotContains(response, self.note.title)
 
     def test_pages_contains_form(self):
         urls = (

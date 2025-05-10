@@ -3,6 +3,12 @@ from http import HTTPStatus
 from .test_dry import (
     BaseClassTest,
     LOGIN_URL,
+    LOGIN_NEXT_LIST_URL,
+    LOGIN_NEXT_SUCCESS_URL,
+    LOGIN_NEXT_ADD_URL,
+    LOGIN_NEXT_DETAIL_URL,
+    LOGIN_NEXT_DELETE_URL,
+    LOGIN_NEXT_EDIT_URL,
     LOGOUT_URL,
     NOTE_ADD_URL,
     NOTE_DETAIL_URL,
@@ -58,12 +64,12 @@ class TestRoutes(BaseClassTest):
 
     def test_redirects_for_anonymous(self):
         test_list = [
-            [NOTE_LIST_URL, self.login_next_list_url],
-            [NOTE_SUCCESS_URL, self.login_next_success_url],
-            [NOTE_ADD_URL, self.login_next_add_url],
-            [NOTE_DETAIL_URL, self.login_next_detail_url],
-            [NOTE_EDIT_URL, self.login_next_edit_url],
-            [NOTE_DELETE_URL, self.login_next_delete_url],
+            [NOTE_LIST_URL, LOGIN_NEXT_LIST_URL],
+            [NOTE_SUCCESS_URL, LOGIN_NEXT_SUCCESS_URL],
+            [NOTE_ADD_URL, LOGIN_NEXT_ADD_URL],
+            [NOTE_DETAIL_URL, LOGIN_NEXT_DETAIL_URL],
+            [NOTE_EDIT_URL, LOGIN_NEXT_EDIT_URL],
+            [NOTE_DELETE_URL, LOGIN_NEXT_DELETE_URL],
         ]
         for url, expected_redirect in test_list:
             with self.subTest(url=url):

@@ -18,6 +18,12 @@ SIGNUP_URL = reverse('users:signup')
 NOTE_EDIT_URL = reverse('notes:edit', args=(SLUG,))
 NOTE_DELETE_URL = reverse('notes:delete', args=(SLUG,))
 NOTE_DETAIL_URL = reverse('notes:detail', args=(SLUG,))
+LOGIN_NEXT_LIST_URL = f'{LOGIN_URL}?next={NOTE_LIST_URL}'
+LOGIN_NEXT_SUCCESS_URL = f'{LOGIN_URL}?next={NOTE_SUCCESS_URL}'
+LOGIN_NEXT_ADD_URL = f'{LOGIN_URL}?next={NOTE_ADD_URL}'
+LOGIN_NEXT_DETAIL_URL = f'{LOGIN_URL}?next={NOTE_DETAIL_URL}'
+LOGIN_NEXT_EDIT_URL = f'{LOGIN_URL}?next={NOTE_EDIT_URL}'
+LOGIN_NEXT_DELETE_URL = f'{LOGIN_URL}?next={NOTE_DELETE_URL}'
 
 
 class BaseClassTest(TestCase):
@@ -34,18 +40,9 @@ class BaseClassTest(TestCase):
         )
         cls.form_data = {
             'text': 'Текст заметки',
-            'title': 'Заголовок',
-            'slug': 'new-slug'
+            'title': 'Новый заголовок из формы',
+            'slug': 'different-slug'
         }
-        cls.login_next_list_url = f'{LOGIN_URL}?next={NOTE_LIST_URL}'
-        cls.login_next_success_url = f'{LOGIN_URL}?next={
-            NOTE_SUCCESS_URL}'
-        cls.login_next_add_url = f'{LOGIN_URL}?next={NOTE_ADD_URL}'
-        cls.login_next_detail_url = f'{LOGIN_URL}?next={
-            NOTE_DETAIL_URL}'
-        cls.login_next_edit_url = f'{LOGIN_URL}?next={NOTE_EDIT_URL}'
-        cls.login_next_delete_url = f'{LOGIN_URL}?next={
-            NOTE_DELETE_URL}'
         cls.client_author = Client()
         cls.client_author.force_login(cls.author)
         cls.client_reader = Client()

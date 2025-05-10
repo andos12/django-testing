@@ -21,10 +21,9 @@ class TestLogic(BaseClassTest):
 
     def test_user_can_create_note(self):
         Note.objects.all().delete()
-        current_count = Note.objects.count()
         response = self.client_author.post(NOTE_ADD_URL, data=self.form_data)
         self.assertRedirects(response, NOTE_SUCCESS_URL)
-        self.assertEqual(Note.objects.count(), current_count + 1)
+        self.assertEqual(Note.objects.count(), 1)
         new_note = Note.objects.get()
         self.assertEqual(new_note.title, self.form_data['title'])
         self.assertEqual(new_note.text, self.form_data['text'])
@@ -32,9 +31,8 @@ class TestLogic(BaseClassTest):
         self.assertEqual(new_note.author, self.author)
 
     def test_not_unique_slug(self):
-        count_note_before = Note.objects.count()
-        note_before = Note.objects.get()
         self.form_data['slug'] = self.note.slug
+        notes_before = list(Note.objects.order_by('id'))
         response = self.client_author.post(
             NOTE_ADD_URL, data=self.form_data)
         self.assertFormError(
@@ -42,23 +40,17 @@ class TestLogic(BaseClassTest):
             'slug',
             self.note.slug + WARNING
         )
-        count_note_after = Note.objects.count()
-        note_after = Note.objects.get()
-        self.assertEqual(count_note_after, count_note_before)
-        self.assertEqual(note_after.text, note_before.text)
-        self.assertEqual(note_after.slug, note_before.slug)
-        self.assertEqual(note_after.author, note_before.author)
+        notes_after = list(Note.objects.order_by('id'))
+        self.assertListEqual(notes_after, notes_before)
 
     def test_empty_slug(self):
         Note.objects.all().delete()
-        current_count = Note.objects.count()
-        self.assertEqual(current_count, 0)
         self.form_data['slug'] = ''
         response = self.client_author.post(
             NOTE_ADD_URL, data=self.form_data)
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        self.assertEqual(Note.objects.count(), current_count + 1)
-        new_note = Note.objects.get(title=self.form_data['title'])
+        self.assertEqual(Note.objects.count(), 1)
+        new_note = Note.objects.first()
         expected_slug = slugify(self.form_data['title'])
         self.assertEqual(new_note.slug, expected_slug)
         self.assertEqual(new_note.text, self.form_data['text'])
@@ -66,8 +58,7 @@ class TestLogic(BaseClassTest):
         self.assertEqual(new_note.author, self.author)
 
     def test_author_can_edit_note(self):
-        note_before = Note.objects.get(id=self.note.id)
-        self.form_data['slug'] = self.note.slug
+
         response = self.client_author.post(
             NOTE_EDIT_URL,
             data=self.form_data
@@ -77,7 +68,7 @@ class TestLogic(BaseClassTest):
         self.assertEqual(note_after.title, self.form_data['title'])
         self.assertEqual(note_after.text, self.form_data['text'])
         self.assertEqual(note_after.slug, self.form_data['slug'])
-        self.assertEqual(note_after.author, note_before.author)
+        self.assertEqual(note_after.author, self.author)
 
     def test_other_user_cant_edit_note(self):
         response = self.client_reader.post(

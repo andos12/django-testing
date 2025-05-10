@@ -6,8 +6,8 @@ from news.forms import CommentForm
 def test_news_count(client, home_url, news_selection):
     response = client.get(home_url)
     news_on_page = response.context['object_list']
-    news_selection = len(news_on_page)
-    assert news_selection == settings.NEWS_COUNT_ON_HOME_PAGE
+    news_count = len(news_on_page)
+    assert news_count == settings.NEWS_COUNT_ON_HOME_PAGE
 
 
 def test_news_order(client, home_url):
