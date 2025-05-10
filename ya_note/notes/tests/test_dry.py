@@ -33,13 +33,13 @@ class BaseClassTest(TestCase):
         cls.author = User.objects.create(username='Лев Толстой')
         cls.reader = User.objects.create(username='Читатель простой')
         cls.note = Note.objects.create(
-            title='Тестовая заметка',
+            title='Заголовок тестовой заметки',
             text='Текст заметки',
             author=cls.author,
             slug=SLUG
         )
         cls.form_data = {
-            'text': 'Текст заметки',
+            'text': 'Новый текст заметки из формы',
             'title': 'Новый заголовок из формы',
             'slug': 'different-slug'
         }
